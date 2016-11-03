@@ -38,6 +38,11 @@ impl Surface {
 		}
 	}
 
+	#[cfg(target_os = "macos")]
+	pub fn resize(&mut self, width: u32, height: u32) {
+
+	}
+
 	pub fn flush(&self) {
 		unsafe {
 			cairo_surface_flush(self.0);
