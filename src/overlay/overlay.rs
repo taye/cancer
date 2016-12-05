@@ -266,6 +266,10 @@ impl Overlay {
 			!ch.chars().any(|c| c.is_alphabetic() || c.is_numeric())
 		}
 
+		fn is_whitespace_boundary(ch: &str) -> bool {
+			ch.chars().any(|c| c.is_whitespace())
+		}
+
 		debug!(target: "cancer::overlay::input", "key {:?}", key);
 
 		// Check if the key is a number that makes operations run N times, if so
@@ -315,6 +319,10 @@ impl Overlay {
 				"e" if key.modifier().is_empty() && prefix == Some(b'g') =>
 					Command::Move(command::Move::Previous(times.unwrap_or(1),
 						command::Previous::Word(command::Word::End(box is_boundary)))),
+
+				"E" if key.modifier() == key::SHIFT && prefix == Some(b'g') =>
+					Command::Move(command::Move::Previous(times.unwrap_or(1),
+						command::Previous::Word(command::Word::End(box is_whitespace_boundary)))),
 
 				"g" if key.modifier().is_empty() && prefix == Some(b'g') =>
 					Command::Scroll(command::Scroll::Begin),
@@ -397,6 +405,18 @@ impl Overlay {
 				"e" if key.modifier().is_empty() =>
 					Command::Move(command::Move::Next(times.unwrap_or(1),
 						command::Next::Word(command::Word::End(box is_boundary)))),
+
+				"W" if key.modifier() == key::SHIFT =>
+					Command::Move(command::Move::Next(times.unwrap_or(1),
+						command::Next::Word(command::Word::Start(box is_whitespace_boundary)))),
+
+				"B" if key.modifier() == key::SHIFT =>
+					Command::Move(command::Move::Previous(times.unwrap_or(1),
+						command::Previous::Word(command::Word::Start(box is_whitespace_boundary)))),
+
+				"E" if key.modifier() == key::SHIFT =>
+					Command::Move(command::Move::Next(times.unwrap_or(1),
+						command::Next::Word(command::Word::End(box is_whitespace_boundary)))),
 
 				// Selection commands.
 				"v" if key.modifier().is_empty() =>
